@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="file"], input[type="text"], button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Chatbot</h1>
+    <h2>Upload PDF</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" accept="application/pdf" required>
+        <button type="submit">Upload PDF</button>
+    </form>
+
+    <h2>Ask a Question</h2>
+    <form id="queryForm">
+        <input type="text" name="query" placeholder="Enter your question" required>
+        <button type="submit">Ask</button>
+    </form>
+
+    <div id="response"></div>
+
+    <script>
+        document.getElementById("uploadForm").onsubmit = async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch("/upload", { method: "POST", body: formData });
+            const result = await response.json();
+            alert(result.message || result.error);
+        };
+
+        document.getElementById("queryForm").onsubmit = async function (e) {
+            e.preventDefault();
+            const query = new FormData(this).get("query");
+            const response = await fetch("/query", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query })
+            });
+            const data = await response.json();
+            document.getElementById("response").innerText = data.response || data.error;
+        };
+    </script>
+</body>
+</html>
